@@ -52,7 +52,7 @@ Tables :
 ===========================================================
 Author       : Harsh Shrivastava
 Email        : shrivastavah35@gmail.com
-GitHub       : 
+GitHub       : https://github.com/harshshrivastava22/hotel_booking_mysql
 Created On   : November 2025
 Database     : MySQL (can be adapted for PostgreSQL / SQLite)
 
