@@ -1,0 +1,180 @@
+1. Occupancy rate by month and city
+
+ select count(b.booking_id) as total_bookings from h.city, date_format(b.checkin_date, '%y-%m') as month, bookings b join hotels h on b.hotel_id = h.hotel_id group by h.city, date_format(b.checkin_date, '%y-%m') order by month, h.city;
+
+output:
+
++-------------+---------+----------------+
+| city        | month   | total_bookings |
++-------------+---------+----------------+
+| New yourk   | 2025-01 |              1 |
+| miami       | 2025-02 |              1 |
+| Denver      | 2025-03 |              1 |
+| los angeles | 2025-04 |              1 |
+| London      | 2025-05 |              1 |
+| Dubai       | 2025-06 |              1 |
+| Sydney      | 2025-07 |              1 |
+| tokyo       | 2025-08 |              1 |
+| Toronto     | 2025-09 |              1 |
+| Zurich      | 2025-10 |              1 |
++-------------+---------+----------------+
+
+
+2. Average stay duration per customer
+
+ select c.cust_id, c.name, round(avg(datediff(b.checkout_date, b.checkin_date)), 1) as avg_stay_days from bookings b join customers c on b.cust_id = c.cust_id group by c.cust_id, c.name order by avg_stay_days desc;
+
++---------+---------------+---------------+
+| cust_id | name          | avg_stay_days |
++---------+---------------+---------------+
+|       5 | Michael Brown |           6.0 |
+|       1 | John Smith    |           5.0 |
+|       2 | Maria Garcia  |           5.0 |
+|       4 | Sarah Lee     |           5.0 |
+|       7 | Ahmed Ali     |           5.0 |
+|       9 | Raj Patel     |           5.0 |
+|      10 | Sophia Rossi  |           5.0 |
+|       3 | David Chen    |           4.0 |
+|       8 | Anna Müller   |           4.0 |
+|       6 | Emma Wilson   |           3.0 |
++---------+---------------+---------------+
+
+
+3. Revenue per available room (RevPAR)
+
+select h.name as hotel_name, h.city, sum(b.total_amount) as total_revenue, count(b.booking_id) as total_bookings, round(sum(b.total_amount) / count(b.booking_id), 2) as revenue_per_room from bookings b join hotels h on b.hotel_id = h.hotel_id group by h.hotel_id, h.name, h.city order by revenue_per_room desc;
+
++--------------------+-------------+---------------+----------------+------------------+
+| hotel_name         | city        | total_revenue | total_bookings | revenue_per_room |
++--------------------+-------------+---------------+----------------+------------------+
+| royal heritage inn | London      |       2500.00 |              1 |          2500.00 |
+| desert hotel       | Dubai       |       1800.00 |              1 |          1800.00 |
+| Lakeview Lodge     | Zurich      |       1600.00 |              1 |          1600.00 |
+| grand palace       | New yourk   |       1500.00 |              1 |          1500.00 |
+| the green paradise | Toronto     |       1200.00 |              1 |          1200.00 |
+| city lights inn    | los angeles |       1100.00 |              1 |          1100.00 |
+| sunset hotel       | Sydney      |        950.00 |              1 |           950.00 |
+| ocean view resort  | miami       |        900.00 |              1 |           900.00 |
+| Urban Stay         | tokyo       |        780.00 |              1 |           780.00 |
+| mountaion retreat  | Denver      |        600.00 |              1 |           600.00 |
++--------------------+-------------+---------------+----------------+------------------+
+
+4. Top countries visiting most frequently
+
+select c.country, count(b.booking_id) as total_bookings from bookings b join customers c on b.cust_id = c.cust_id group by c.country order by total_bookings desc limit 10;
++-----------+----------------+
+| country   | total_bookings |
++-----------+----------------+
+| USA       |              1 |
+| Spain     |              1 |
+| China     |              1 |
+| UK        |              1 |
+| Australia |              1 |
+| Canada    |              1 |
+| UAE       |              1 |
+| Germany   |              1 |
+| India     |              1 |
+| Italy     |              1 |
++-----------+----------------+
+
+5. Most popular room type overall
+
+ select room_type, count(*) as total_bookings from bookings group by room_type order by total_bookings desc;
++-----------+----------------+
+| room_type | total_bookings |
++-----------+----------------+
+| Suite     |              3 |
+| Double    |              3 |
+| Single    |              2 |
+| Deluxe    |              2 |
++-----------+----------------+
+
+6. Average spend per night per customer
+
+ select c.name, round(sum(b.total_amount) / sum(datediff(b.checkout_date, b.checkin_date)), 2) as avg_spend_per_night from bookings b join customers c on b.cust_id = c.cust_id group by c.cust_id, c.name order by avg_spend_per_night desc;
++---------------+---------------------+
+| name          | avg_spend_per_night |
++---------------+---------------------+
+| Emma Wilson   |              600.00 |
+| Michael Brown |              416.67 |
+| Sophia Rossi  |              320.00 |
+| John Smith    |              300.00 |
+| Raj Patel     |              240.00 |
+| Sarah Lee     |              220.00 |
+| Anna Müller   |              195.00 |
+| Ahmed Ali     |              190.00 |
+| Maria Garcia  |              180.00 |
+| David Chen    |              150.00 |
++---------------+---------------------+
+
+
+7. City-wise occupancy count by month
+
+ select h.city, date_format(b.checkin_date, '%y-%m') as month, count(b.booking_id) as total_bookings from bookings b join hotels h on b.hotel_id = h.hotel_id group by h.city, date_format(b.checkin_date, '%y-%m') order by h.city, month;
+
++-------------+-------+----------------+
+| city        | month | total_bookings |
++-------------+-------+----------------+
+| Denver      | 25-03 |              1 |
+| Dubai       | 25-06 |              1 |
+| London      | 25-05 |              1 |
+| los angeles | 25-04 |              1 |
+| miami       | 25-02 |              1 |
+| New yourk   | 25-01 |              1 |
+| Sydney      | 25-07 |              1 |
+| tokyo       | 25-08 |              1 |
+| Toronto     | 25-09 |              1 |
+| Zurich      | 25-10 |              1 |
++-------------+-------+----------------+
+
+8. Most frequent customers
+
+ select c.name, count(b.booking_id) as booking_count from bookings b join customers c on b.cust_id = c.cust_id group by c.cust_id, c.name order by booking_count desc limit 5;
++---------------+---------------+
+| name          | booking_count |
++---------------+---------------+
+| John Smith    |             1 |
+| Maria Garcia  |             1 |
+| David Chen    |             1 |
+| Sarah Lee     |             1 |
+| Michael Brown |             1 |
++---------------+---------------+
+
+9. Average stay duration by city
+
+ select h.city, round(avg(datediff(b.checkout_date, b.checkin_date)), 1) as avg_stay_days from bookings b join hotels h on b.hotel_id = h.hotel_id group by h.city order by avg_stay_days desc;
++-------------+---------------+
+| city        | avg_stay_days |
++-------------+---------------+
+| London      |           6.0 |
+| New yourk   |           5.0 |
+| miami       |           5.0 |
+| los angeles |           5.0 |
+| Sydney      |           5.0 |
+| Toronto     |           5.0 |
+| Zurich      |           5.0 |
+| Denver      |           4.0 |
+| tokyo       |           4.0 |
+| Dubai       |           3.0 |
++-------------+---------------+
+
+10. Peak booking months
+
+ select monthname(checkin_date) as month_name, count(*) as total_bookings from bookings group by month(checkin_date) order by total_bookings desc;
+
++------------+----------------+
+| month_name | total_bookings |
++------------+----------------+
+| January    |              1 |
+| February   |              1 |
+| March      |              1 |
+| April      |              1 |
+| May        |              1 |
+| June       |              1 |
+| July       |              1 |
+| August     |              1 |
+| September  |              1 |
+| October    |              1 |
++------------+----------------+
+
+
